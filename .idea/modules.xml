@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Functor.iml" filepath="$PROJECT_DIR$/.idea/modules/Functor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Functor-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Functor-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pruebas.iml" filepath="$PROJECT_DIR$/.idea/modules/Pruebas.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pruebas-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Pruebas-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/miCats.iml" filepath="$PROJECT_DIR$/.idea/modules/miCats.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/miCats-build.iml" filepath="$PROJECT_DIR$/.idea/modules/miCats-build.iml" />
+    </modules>
+  </component>
+</project>
