@@ -4,12 +4,12 @@ import org.scalatest.FunSuite
 
 class MonoidTest extends FunSuite {
 
-  test("Puedo crear mi propio Monoid de Int. " +
+  test("Puedo crear mi propio Monoid de Int, con valor inicial de 0. " +
     "Dado: " +
-    " -> Un implicit para sobrescribir el valor inicial de Int por 999. " +
+    " -> Un implicit para sobrescribir el valor inicial de Int. " +
     " -> Una suma de dos número, uno con valor empty y otro con valor de 1. " +
     "Entonces: " +
-    " -> El resultado de la suma es 1000. ") {
+    " -> El resultado de la suma es 1. ") {
 
     // Import que permite trabajar con Monoid
     import cats.Monoid
@@ -18,9 +18,9 @@ class MonoidTest extends FunSuite {
     implicit val miMonoidParaInt: Monoid[Int] = new Monoid[Int] {
       /*
        El valor inicial o vacio para los Int en este test será
-       de 999
+       de 0
       */
-      override def empty: Int = 999
+      override def empty: Int = 0
       override def combine(x: Int, y: Int): Int = x + y
     }
 
@@ -29,7 +29,28 @@ class MonoidTest extends FunSuite {
 
     val resultadoSuma = numero1 + numero2
 
-    assert( resultadoSuma == 1000 )
+    assert( resultadoSuma == 1 )
+  }
+
+  test("Puedo crear mi propio Monoid de Int para multiplicar un solo elemento. " +
+    "Dado: " +
+    " -> Un implicit para sobrescribir el valor inicial de Int. " +
+    " -> Una multiplicación de una lista con un solo número. " +
+    "Entonces: " +
+    " -> El resultado de la multiplicación es 2. ") {
+    import cats.Monoid
+    import cats.syntax.semigroup._
+
+    implicit val multiplicacionInt: Monoid[Int] = new Monoid[Int] {
+      override def empty: Int = 1
+      override def combine(x: Int, y: Int): Int = x * y
+    }
+
+    val numerosAMultiplicar: List[Int] = List(2)
+
+    val resultado: Int = numerosAMultiplicar.fold(Monoid[Int].empty)( _ |+| _)
+
+    assert( resultado == 2)
 
   }
 
@@ -57,25 +78,25 @@ class MonoidTest extends FunSuite {
     // Se define el propio monoid para Int
     implicit val miMonoidParaDinero: Monoid[Dinero] = new Monoid[Dinero] {
       /*
-       El valor inicial o vacio para los Int en este test será
-       de 999
+       El valor inicial o vacio para los Double en este test será
+       de 1.0
       */
       override def empty: Dinero = Dinero(1.0)
       override def combine(x: Dinero, y: Dinero): Dinero = Dinero( x.valor + y.valor )
     }
 
-    def sumarDinero( dineros: List[Dinero] ): Dinero =
-      dineros.foldRight(Monoid[Dinero].empty)((dinero, acumulado) =>
-        acumulado |+| dinero)
+    def sumarDineros[A: Monoid](elementos: List[A] ): A =
+      elementos.foldRight(Monoid[A].empty)((elementoActual, acumulado) =>
+        acumulado |+| elementoActual)
 
     // Lista con varios objetos de Dinero
-    val muchoDinero = List[Dinero](Dinero(10.0), Dinero(25.0))
+    val muchoDinero: List[Dinero] = List(Dinero(10.0), Dinero(25.0))
     // Lista sin objetos de Dinero.
-    val sinDinero = List[Dinero]()
+    val sinDinero: List[Dinero] = List()
 
     // Se suman los dineros.
-    val resultadoMuchoDinero: Dinero = sumarDinero( muchoDinero )
-    val resultadoSinDinero: Dinero = sumarDinero( sinDinero )
+    val resultadoMuchoDinero: Dinero = sumarDineros( muchoDinero )
+    val resultadoSinDinero: Dinero = sumarDineros( sinDinero )
 
     // El valor mínimo que siempre se sumará es de 1.0, en caso que la lista este vacia.
     assert( Dinero(36.0) == resultadoMuchoDinero)
