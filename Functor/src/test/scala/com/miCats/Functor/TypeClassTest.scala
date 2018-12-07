@@ -18,7 +18,7 @@ class TypeClassTest extends FunSuite{
     }
 
     // Un case class cualquiera, de dos parámetros
-    case class Persona(nombre: String, apellidos: String)
+    final case class Persona(nombre: String, apellidos: String)
 
     /*
     Hacemos la instancia del Type Class para los Int y para Persona.
@@ -27,10 +27,10 @@ class TypeClassTest extends FunSuite{
      */
     object ImpresoraInstancias {
         implicit val imprimirNumeros: Impresora[Int] = new Impresora[Int] {
-          override def imprimir(elemento: Int): String = s"El número es: ${elemento} "
+          override def imprimir(elemento: Int): String = s"El número es: ${elemento}"
         }
       implicit val imprimirPersona: Impresora[Persona] = new Impresora[Persona] {
-        override def imprimir(elemento: Persona): String = s"La persona se llama: ${elemento.nombre} ${elemento.apellidos} "
+        override def imprimir(elemento: Persona): String = s"La persona se llama: ${elemento.nombre} ${elemento.apellidos}"
       }
     }
 
@@ -41,30 +41,69 @@ class TypeClassTest extends FunSuite{
       def imprimir[A](elemento: A)(implicit imp: Impresora[A]): String = {
         imp.imprimir(elemento)
       }
-      def imprimirMuchos[A](elemnto: List[A])(implicit imp: Impresora[A]): String = {
-        elemnto.map(imp.imprimir).mkString
-      }
     }
 
     // Los objetos que van a ser imprimidos
     val numero: Int = 9
-    val listaNumeros: List[Int] = List(1,2,3)
     val persona: Persona = Persona("Juan", "Pérez")
-    val listaPersonas: List[Persona] = List(Persona("Juan","Pérez"), Persona("Ana","Álvarez"))
-
 
     /*
      Se llama la función imprimir de Int y Persona, únicamente pasándole implicitamente (para este test es explicitamente)
      la instancia de cómo imprimir Int o imprimir Persona.
       */
-    assert( Impresora.imprimir(numero)(ImpresoraInstancias.imprimirNumeros) == "El número es: 9 ")
-    assert( Impresora.imprimir(persona)(ImpresoraInstancias.imprimirPersona) == "La persona se llama: Juan Pérez ")
+    assert( Impresora.imprimir(numero)(ImpresoraInstancias.imprimirNumeros) == "El número es: 9")
+    assert( Impresora.imprimir(persona)(ImpresoraInstancias.imprimirPersona) == "La persona se llama: Juan Pérez")
+
+  }
+
+  test("Crean un mi primer Type Class con mejor sintaxis") {
+
+    // Este es el type class
+    trait Impresora[A] {
+      def imprimir(elemento: A): String
+    }
+
+    // Un case class cualquiera, de dos parámetros
+    final case class Persona(nombre: String, apellidos: String)
 
     /*
-    Adicionalmente podemos llamar otras funciones que usen el imprimir internamente.
+    Hacemos la instancia del Type Class para los Int y para Persona.
+    Agregamos nueva funcionalidad sin necesidad a la función de imprimir, sin modificar
+    el código ya existente hasta este punto.
      */
-    assert( Impresora.imprimirMuchos(listaNumeros)(ImpresoraInstancias.imprimirNumeros) == "El número es: 1 El número es: 2 El número es: 3 " )
-    assert( Impresora.imprimirMuchos(listaPersonas)(ImpresoraInstancias.imprimirPersona) == "La persona se llama: Juan Pérez La persona se llama: Ana Álvarez " )
+    object ImpresoraInstancias {
+      implicit val imprimirNumeros: Impresora[Int] = new Impresora[Int] {
+        override def imprimir(elemento: Int): String = s"El número es: ${elemento}"
+      }
+      implicit val imprimirPersona: Impresora[Persona] = new Impresora[Persona] {
+        override def imprimir(elemento: Persona): String = s"La persona se llama: ${elemento.nombre} ${elemento.apellidos}"
+      }
+    }
+
+    /*
+    Se define un objeto que hace las veces de interfaz
+     */
+    object ImprimirCosas {
+      implicit class ImprimirNumero[A](elemento: A) {
+        def imprimir(implicit imp: Impresora[A]): String = {
+          imp.imprimir(elemento)
+        }
+      }
+    }
+
+    // Los objetos que van a ser imprimidos
+    val numero: Int = 9
+    val persona: Persona = Persona("Juan", "Pérez")
+
+
+    import ImprimirCosas._
+    import ImpresoraInstancias._
+    /*
+     Se llama la función imprimir de Int y Persona, e importando los implicitos. Es más natural llamar la función imprimir
+     del objeto `numero` y `persona`
+      */
+    assert( numero.imprimir  == "El número es: 9")
+    assert( persona.imprimir == "La persona se llama: Juan Pérez")
 
   }
 
