@@ -107,4 +107,29 @@ class TypeClassTest extends FunSuite{
 
   }
 
+
+  test("Agregando una nueva funcionalidad al Type Class Show. " +
+    "Se le agrega la posibilidad de usar show para los tipos de objeto Celular") {
+
+    import cats.Show
+    import cats.instances.string._
+    import cats.syntax.show._
+
+    final case class Celular( marca: String )
+
+    // Se define la instancia de Show para Celular
+    object MostrarCelular {
+      implicit val mostrar: Show[Celular] = new Show[Celular] {
+        override def show(t: Celular): String = s"El celular es ${t.marca.show}"
+      }
+    }
+
+    val miCelular = Celular("Xioami")
+
+    // Se llama la función show sobre el objeto de tipo Celular
+    import MostrarCelular._
+    assert( miCelular.show == "El celular es Xioami")
+
+  }
+
 }
