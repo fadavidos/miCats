@@ -4,6 +4,28 @@ import org.scalatest.FunSuite
 
 class MonoidTest extends FunSuite {
 
+  /*
+  Un Monoid tiene:
+    * Una operación de combinación (Semigroup)
+    * Un valor inicial
+
+  Se expresa así:
+
+  trait Semigroup[A] {
+    def combine(x: A, y: A): A
+  }
+  
+  trait Monoid[A] extends Semigroup[A] {
+    def empty: A
+  }
+
+  Los Monoids obedecen a algunas leyes:
+    * Asociativa:
+    *
+
+
+   */
+
   test("Puedo crear mi propio Monoid de Int, con valor inicial de 0. " +
     "Dado: " +
     " -> Un implicit para sobrescribir el valor inicial de Int. " +
