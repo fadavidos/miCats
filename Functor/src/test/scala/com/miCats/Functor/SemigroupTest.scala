@@ -6,7 +6,7 @@ class SemigroupTest extends FunSuite{
 
   test("Mi primer Semigroup. Un Semigroup permite combinar dos elementos del mismo " +
     "tipo, dando como resultado solo un elemento de ese tipo. Adicionalmente no debe verse alterado " +
-    "el resultado si se cambia el orden de la combinación. " +
+    "el resultado si se cambia el orden de la combinación. (A esto se le llama propiedad asociativa) " +
     "Dado: " +
     " -> Se crea un implicit Semigroup para Int, redefiniendo la operación asociativa. " +
     " -> Se definen 3 números" +
@@ -26,13 +26,17 @@ class SemigroupTest extends FunSuite{
     val numero2 = 5
     val numero3 = 7
 
+    // Validamos que la propiedad asociativa si se cumpla.
+    // (el orden de los elementos en la combinación no altera el resultado en sí )
     val resultadoCombinacion1 = Semigroup[Int].combine( numero1, numero2)
     val resultadoCombinacion2 = Semigroup[Int].combine( numero2, numero1)
-    val resultadoCombinacion3 = Semigroup[Int].combine( numero1, Semigroup[Int].combine(numero2, numero3))
-    val resultadoCombinacion4 = Semigroup[Int].combine( numero3, Semigroup[Int].combine(numero2, numero1))
-
     assert( resultadoCombinacion1 == 7)
     assert( resultadoCombinacion2 == 7)
+
+    // Validamos que la propiedad asociativa si se cumpla.
+    // (el orden de los elementos en la combinación no altera el resultado en sí )
+    val resultadoCombinacion3 = Semigroup[Int].combine( numero1, Semigroup[Int].combine(numero2, numero3))
+    val resultadoCombinacion4 = Semigroup[Int].combine( numero3, Semigroup[Int].combine(numero2, numero1))
     assert( resultadoCombinacion3 == 14)
     assert( resultadoCombinacion4 == 14)
   }
