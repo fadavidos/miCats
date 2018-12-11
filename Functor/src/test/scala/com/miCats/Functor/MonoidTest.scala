@@ -14,7 +14,7 @@ class MonoidTest extends FunSuite {
   trait Semigroup[A] {
     def combine(x: A, y: A): A
   }
-  
+
   trait Monoid[A] extends Semigroup[A] {
     def empty: A
   }
