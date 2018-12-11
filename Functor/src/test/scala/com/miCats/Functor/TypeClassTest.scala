@@ -10,8 +10,6 @@ class TypeClassTest extends FunSuite{
     * En Cats, una Type Class se representa por un Trait y al menos un parámetro.
    */
   test("Crean un mi primer Type Class") {
-
-
     // Este es el type class
     trait Impresora[A] {
       def imprimir(elemento: A): String
@@ -26,9 +24,9 @@ class TypeClassTest extends FunSuite{
     el código ya existente hasta este punto.
      */
     object ImpresoraInstancias {
-        implicit val imprimirNumeros: Impresora[Int] = new Impresora[Int] {
-          override def imprimir(elemento: Int): String = s"El número es: ${elemento}"
-        }
+      implicit val imprimirNumeros: Impresora[Int] = new Impresora[Int] {
+        override def imprimir(elemento: Int): String = s"El número es: ${elemento}"
+      }
       implicit val imprimirPersona: Impresora[Persona] = new Impresora[Persona] {
         override def imprimir(elemento: Persona): String = s"La persona se llama: ${elemento.nombre} ${elemento.apellidos}"
       }
