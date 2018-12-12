@@ -14,13 +14,8 @@ lazy val Functor = (project in file("Functor"))
     commonSettings
   )
 
-lazy val Pruebas = (project in file("Pruebas"))
-  .settings(
-    commonSettings
-  )
-
 lazy val miCats = (project in file("."))
-  .aggregate(Functor, Pruebas)
+  .aggregate(Functor)
   .settings(
     aggregate in update := false
   )
