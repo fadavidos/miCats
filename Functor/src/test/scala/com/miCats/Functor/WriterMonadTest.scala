@@ -4,7 +4,7 @@ package com.miCats.Functor
 
 import org.scalatest.FunSuite
 
-class WriteMonadTest extends FunSuite {
+class WriterMonadTest extends FunSuite {
 
   /*
 
