@@ -1,7 +1,7 @@
 package com.miCats.Functor
 
-
-
+import cats.{Id, data}
+import cats.data.WriterT
 import org.scalatest.FunSuite
 
 class WriterMonadTest extends FunSuite {
@@ -133,6 +133,34 @@ class WriterMonadTest extends FunSuite {
     assert( transformacionmapBoth.written == vectorEsperado )
     assert( transformacionmapBoth.value == 2 )
 
+  }
+
+  test("creando un tipo propio de Writer para dar un resultado de la suma de 3 números aleatorio, " +
+    "pero adicional registra los números que aleatoriamente se generan. Es decir que al final se verá el " +
+    "resultado y en los logs se ve cuáles números intervinieron para llegar al resultado. ") {
+    import cats.data.Writer
+    import cats.instances.vector._
+    import scala.util.Random
+
+    type Aleatorio[A] = Writer[Vector[String], Int]
+
+    def obtenerNumeroAleatorio(): Aleatorio[Int] = {
+      val numero = Random.nextInt(100)
+      Writer(Vector(s"el número es ${numero}"), numero)
+    }
+
+    val respuesta = for {
+      numero1 <- obtenerNumeroAleatorio()
+      numero2 <- obtenerNumeroAleatorio()
+      numero3 <- obtenerNumeroAleatorio()
+    } yield {
+      numero1 + numero2 + numero3
+    }
+
+    respuesta.written.foreach( println )
+    println( respuesta.value )
+    assert( respuesta.written.forall( a => a.startsWith("el número es")) )
+    assert( respuesta.value >= 0 && respuesta.value <= 300)
   }
 
 }
