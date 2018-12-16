@@ -9,7 +9,10 @@ class ReaderMonadTest extends FunSuite {
   /*
     Reader nos permite crear operaciones o cumputos que dependen de alguna entrada.
     Un uso común para los Reader es la inyección de dependencias.
-    Un Reader representa una función A => B
+    Un Reader representa una función A => B.
+    Los Reader se deberían usar cuando:
+      * Queremos testear partes aisladas de un programa
+      * Queremos diferenciar los parametrós de entrada de las dependencias
    */
 
   test("Creamos una función que necesita una Operacion para poder ejecutarse. " +
