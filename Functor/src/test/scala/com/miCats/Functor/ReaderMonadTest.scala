@@ -1,5 +1,7 @@
 package com.miCats.Functor
 
+
+import cats.Id
 import org.scalatest.FunSuite
 
 class ReaderMonadTest extends FunSuite {
@@ -54,7 +56,54 @@ class ReaderMonadTest extends FunSuite {
     val resultadoFor: (Int, Int) = resultadoTuplaFor.run(operacion)
 
     assert( resultadoFor == (7, 1))
+  }
 
+  test("Calcular el iva de un producto pasándo a través de un Reader la configuración del sistema. " +
+    "Donde: " +
+    " - Se carga la configuración del sistema. " +
+    " - Se define una función para convertir un String a un Option[Double]. None en caso de no poderse convertir. " +
+    " - Se define una función para calcular el iva de un producto, tomando el valor del producto y multiplicandolo " +
+    "     por el iva (el cuál es obtenido de la configuración del sistema.). " +
+    " - Se crea un producto. " +
+    " - Se envía el producto a la función de calcular el precio con iva incluido. " +
+    " - Se hace validación de la respuesta del calculo del iva + valor del producto. " +
+    "Entonces: " +
+    " - Al valor del producto se le añade el iva obtenido de la configuración. ") {
+    import com.typesafe.config.ConfigFactory
+    import com.typesafe.config.Config
+    import cats.data.Reader
+
+    val config = ConfigFactory.load()
+
+    case class Producto(nombre:String, valor:Double)
+
+    def aDouble(s: String ): Option[Double] = {
+      try
+        Some( s.toDouble )
+      catch {
+        case _: NumberFormatException => None
+      }
+    }
+
+    def calcularProductoConIva(producto: Producto): Reader[Config, Either[String, Double]] = Reader {
+      case config: Config =>
+        val opValorIva: Option[Double] = aDouble(config.getString("impuestos.iva"))
+
+        opValorIva.fold[Either[String, Double]](
+          Left("No se encontró el valor del iva")
+        )(
+          iva => Right(producto.valor * iva)
+        )
+    }
+
+    val computador = Producto( "portatil", 100 )
+    // Se llama la función `run` para enviar o pasar la configuración del sistema
+    val valorIva: Id[Either[String, Double]] = calcularProductoConIva(computador).run(config)
+
+    valorIva match {
+      case Right( valor ) => assert( valor == 119D)
+      case Left( _ ) => assert( false )
+    }
   }
 
 }
