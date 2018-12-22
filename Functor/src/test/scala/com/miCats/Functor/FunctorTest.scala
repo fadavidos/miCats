@@ -5,7 +5,7 @@ import org.scalatest.{FunSuite, TestSuite}
 class FunctorTest extends FunSuite{
 
   /*
-  Básicamente un Fuctor es cualquier cosa con la función  map.
+  Básicamente un Fuctor es cualquier cosa que tenga la función `map`.
 
   Un funtor F[A]:
    * Es un type class
@@ -20,13 +20,6 @@ class FunctorTest extends FunSuite{
             sobre el valor del Functor.
         - Composition: hacer map sobre las funciones g y f es lo mismo que hacer map sobre g y luego map sobre f
             fa.map(g(f(_))) == fa.map(f).map(g)
-
-
-   Qué es un Type Class ?
-    * Los Type Class nos permiten agregar nuevas funcionalidades a librerías ya existentes. Sin usar la herencia tradicional.
-    * En Cats, una Type Class se representa por un Trait y al menos un parámetro.
-
-
    */
 
   test("") {
