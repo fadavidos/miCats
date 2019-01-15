@@ -54,4 +54,16 @@ class FunctorTest extends FunSuite{
     assert( resultadoSaludo1 == "Hola CATS")
   }
 
+  /*
+    Type constructor:
+    * Son como tipos de tipos. Se diferencian de los tipos (type) normales porque tienen un "hole" (_).
+    * Option es un type constructor porque tiene un "hole" Option[_], donde podemos reemplazar el _ por el
+        tipo que queremos, ejemplo: Option[Int], Option[Persona].
+    *Se debe diferenciar los type de los type constructor
+        List    => type constructor
+        List[A] => type
+        Se puede hacer el simil con las funciones y los valores. Una función necesita parámetros para dar un resultado
+        Mientras que el valor ya es el resultado en si. Los Type Constructor necesitan un "parámetro"
+   */
+
 }
