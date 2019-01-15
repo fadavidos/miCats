@@ -22,10 +22,36 @@ class FunctorTest extends FunSuite{
             fa.map(g(f(_))) == fa.map(f).map(g)
    */
 
-  test("") {
-    import cats.Functor
+  test("Option es un functor, con el cual demostramos que cumple la ley de Identity") {
+    val valorOpcional: Option[Int] = Some(10)
+    assertResult( Some(10) ) {
+      valorOpcional.map( identity )
+    }
+  }
 
+  test("Future es un functor, con el cual demostramos que cumple la ley de Composition") {
+    import scala.concurrent.{Future, Await}
+    import scala.concurrent.ExecutionContext.Implicits.global
+    import scala.concurrent.duration._
 
+    val futuro:Future[String] = Future("Cats")
+
+    def mayusculas(valor: String): String = {
+      valor.toUpperCase
+    }
+
+    def saludar(valor: String): String = {
+      s"Hola ${valor}"
+    }
+
+    val saludo1: Future[String] = futuro.map(valor => saludar(mayusculas(valor)))
+    val saludo2: Future[String] = futuro.map(valor => mayusculas(valor)).map( valor => saludar(valor))
+
+    val resultadoSaludo1: String = Await.result( saludo1, 3 seconds )
+    val resultadoSaludo2: String = Await.result( saludo2, 3 seconds )
+
+    assert( resultadoSaludo1 == resultadoSaludo2)
+    assert( resultadoSaludo1 == "Hola CATS")
   }
 
 }
