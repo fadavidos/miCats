@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 class MonoidTest extends FunSuite {
 
   /*
-  Un Monoid tiene:
+  Un Monoid es un type class que tiene:
     * Una operación de combinación (Semigroup)
     * Un valor inicial (identity)
 

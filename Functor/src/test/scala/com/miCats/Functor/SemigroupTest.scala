@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 class SemigroupTest extends FunSuite{
 
   /*
-    Un Semigroup tiene una operación asociativa y se expresa así:
+    Un Semigroup es un type class que tiene una operación asociativa y se expresa así:
 
     trait Semigroup[A] {
       def combine(x: A, y: A): A
