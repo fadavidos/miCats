@@ -7,7 +7,7 @@ class TypeClassTest extends FunSuite{
   /*
    Qué es un Type Class ?
     * Los Type Class nos permiten agregar nuevas funcionalidades a librerías ya existentes. Sin usar la herencia tradicional.
-    * En Cats, una Type Class se representa por un Trait y al menos un parámetro.
+    * En Cats, una Type Class se representa por un Trait y almenos un parámetro.
    */
   test("Crean un mi primer Type Class") {
     // Este es el type class
