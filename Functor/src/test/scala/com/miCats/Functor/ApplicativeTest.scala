@@ -6,7 +6,10 @@ class ApplicativeTest extends FunSuite {
 
   /*
     Applicative Functors o más fácil Applicative: Applicative[F[_]]
-    * Extiende de Functor
+
+    * Extiende de Functor, pero a diferencia de éste, es capaz de trabajar con multiples
+       efectos independientes y posteriormente componerlos.
+
     * Tiene una función `pure`, que permite embolver un dato dentro de un type constructor =>  def pure[A](x: A): F[A]
 
    */
@@ -64,6 +67,7 @@ class ApplicativeTest extends FunSuite {
 
 
 
+
   }
 
   test("por que no sirve") {
@@ -97,6 +101,18 @@ class ApplicativeTest extends FunSuite {
     println(result)
   }
 
+
+  test("hola") {
+    import scala.concurrent.Future
+    import scala.concurrent.ExecutionContext.Implicits.global
+    import cats.Functor
+
+    def bar[F[_], A](x: F[A], y: F[A])= println(x)
+
+    val x: Option[String] = ???
+    //x.map()
+    bar(Future(2), Future(3))
+  }
 
 
 

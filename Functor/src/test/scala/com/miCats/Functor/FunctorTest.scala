@@ -1,8 +1,8 @@
 package com.miCats.Functor
 
-import org.scalatest.{FunSuite, TestSuite}
+import org.scalatest.AsyncFunSuite
 
-class FunctorTest extends FunSuite{
+class FunctorTest extends AsyncFunSuite{
 
   /*
   Básicamente un Fuctor es cualquier cosa que tenga la función `map`.
@@ -31,7 +31,6 @@ class FunctorTest extends FunSuite{
 
   test("Future es un functor, con el cual demostramos que cumple la ley de Composition") {
     import scala.concurrent.{Future, Await}
-    import scala.concurrent.ExecutionContext.Implicits.global
     import scala.concurrent.duration._
 
     val futuro:Future[String] = Future("Cats")
@@ -52,6 +51,61 @@ class FunctorTest extends FunSuite{
 
     assert( resultadoSaludo1 == resultadoSaludo2)
     assert( resultadoSaludo1 == "Hola CATS")
+  }
+
+  test("Componiendo diferentes Functores. " +
+    "Para componer diferentes functores se usa la función `compose` y así evitamos tener que estar " +
+    "usando repetidamente la función `map`") {
+
+    import cats.Functor
+    import cats.implicits._
+    import scala.concurrent.Future
+
+    val dato: Future[Option[Int]] = Future(Some(5))
+
+    def doblarNumero(numero: Int): Int = numero * 2
+
+    /*
+    Al llamar la función `map` se reciben dos parámetros:
+      1. (fa: Future[Option[A]) un tipo de dato que cumpla con F[G[_]]
+      2. (f: A => B) la función que parsará del tipo de dato A a B
+     */
+    val resultadoCombinacion: Future[Option[Int]] = Functor[Future].compose[Option].map(dato)(doblarNumero)
+
+    /*
+    Sin hacer composición la manera para aplicar la función al tipo de dato Int sería
+    hacer map sobre el Futuro, posteriormente map sobre el Option, y en ese momento
+    aplicar la función sobre el valor del Option.
+
+      dato.map(_.map(doblarNumero))
+
+     */
+    resultadoCombinacion map { valor => assert(valor == Some(10)) }
+  }
+
+  test("otra composición") {
+
+//    val listOption: List[Option[Int]] = List(Some(1), None, Some(2))
+//    val r: List[Option[Int]] = Functor[List].compose[Option].map(listOption)(_ + 1)
+//
+//    def anidado[F[_]: Functor, A](elemento: F[A]): F[A] = {
+//      Functor[F].map(elemento)( e => {
+//        //println(e)
+//        e
+//      })
+//    }
+
+
+//    val composicion = Functor[List].compose[Option]
+//    type tipoListaOpcional[A] = List[Option[A]]
+//    val listOptionFuture: List[Option[Future[Int]]] = List(Some(Future(1)), None, Some(Future(2)))
+//    val x: tipoListaOpcional[Int] = anidado[tipoListaOpcional, Int](listOption)(composicion)
+//
+//    println(s"si: ${x}")
+
+
+    ???
+
   }
 
   /*
