@@ -83,6 +83,47 @@ class FunctorTest extends AsyncFunSuite{
     resultadoCombinacion map { valor => assert(valor == Some(10)) }
   }
 
+  test("Componiendo diferentes Functores. " +
+    "Componemos 3 Fuctores diferentes, `Future`, `List` y `Option`, a través de la función `compose`. " +
+    "Permitiendo acceder al valor interno sin necesidad de anidar llamados a la función `map`. ") {
+
+    import cats.Functor
+    import cats.implicits._
+    import scala.concurrent.Future
+
+    // Se crea un tipo propio de dato, que represente algo para nosotros.
+    type PosiblesElementosAsync[x] = Future[List[Option[x]]]
+
+    // implicito requerido para identificar cómo componer los Functores.
+    implicit val implicitPosiblesElementosAsync = Functor[Future] compose Functor[List] compose Functor[Option]
+
+    // Funciones de negocio
+    def funcionDoblarNumero(numero: Int): Int = numero * 2
+    def funcionAMayusculas(texto: String): String = texto.toUpperCase
+
+    // Tenemos dos PosiblesElementosAsync de enteros y palabras, simulando el resultado de una consulta a BD
+    val miFloInt: PosiblesElementosAsync[Int] = Future(List(Some(5), None))
+    val miFloString: PosiblesElementosAsync[String] = Future(List(Some("hola"), Some("Functor")))
+
+    // Simplemente indicamos que vamos a hacer un `map` a nuestro tipo de dato (que son functores anidados)
+    // y solo es necesario pasar cuál es la transformación que se quiere hacer.
+    val resultadoCombinacionInt: PosiblesElementosAsync[Int] = Functor[PosiblesElementosAsync](implicitPosiblesElementosAsync)
+      .map(miFloInt)(funcionDoblarNumero)
+    val resultadoCombinacionString: PosiblesElementosAsync[String] = Functor[PosiblesElementosAsync](implicitPosiblesElementosAsync)
+      .map(miFloString)(funcionAMayusculas)
+    // Con un solo llamado a la función `map` pudimos aplicar una función al tipo de dato de nuestro propio tipo,
+    // siendo mucho más fácil de leer que llamados anidados de `map`.
+
+
+    // Finalmente se valida que las transformaciones fueron aplicadas.
+    resultadoCombinacionInt map {
+      x => assert( x == List(Some(10), None) )
+    }
+    resultadoCombinacionString map {
+      x => assert( x == List(Some("HOLA"), Some("FUNCTOR")))
+    }
+  }
+
   test("otra composición") {
 
 //    val listOption: List[Option[Int]] = List(Some(1), None, Some(2))
