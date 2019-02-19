@@ -2,7 +2,7 @@ package com.miCats.Functor
 
 import org.scalatest.AsyncFunSuite
 
-class FunctorTest extends AsyncFunSuite{
+class FunctorTest extends AsyncFunSuite {
 
   /*
   Básicamente un Fuctor es cualquier cosa que tenga la función `map`.
@@ -24,14 +24,11 @@ class FunctorTest extends AsyncFunSuite{
 
   test("Option es un functor, con el cual demostramos que cumple la ley de Identity") {
     val valorOpcional: Option[Int] = Some(10)
-    assertResult( Some(10) ) {
-      valorOpcional.map( identity )
-    }
+    assert( Some(10) == valorOpcional.map( identity ))
   }
 
   test("Future es un functor, con el cual demostramos que cumple la ley de Composition") {
-    import scala.concurrent.{Future, Await}
-    import scala.concurrent.duration._
+    import scala.concurrent.Future
 
     val futuro:Future[String] = Future("Cats")
 
@@ -46,11 +43,13 @@ class FunctorTest extends AsyncFunSuite{
     val saludo1: Future[String] = futuro.map(valor => saludar(mayusculas(valor)))
     val saludo2: Future[String] = futuro.map(valor => mayusculas(valor)).map( valor => saludar(valor))
 
-    val resultadoSaludo1: String = Await.result( saludo1, 3 seconds )
-    val resultadoSaludo2: String = Await.result( saludo2, 3 seconds )
-
-    assert( resultadoSaludo1 == resultadoSaludo2)
-    assert( resultadoSaludo1 == "Hola CATS")
+    for {
+      s1 <- saludo1
+      s2 <- saludo2
+    } yield {
+      assert( s1 == "Hola CATS")
+      assert( s1 == s2)
+    }
   }
 
   test("Componiendo diferentes Functores. " +
@@ -70,7 +69,7 @@ class FunctorTest extends AsyncFunSuite{
       1. (fa: Future[Option[A]) un tipo de dato que cumpla con F[G[_]]
       2. (f: A => B) la función que parsará del tipo de dato A a B
      */
-    val resultadoCombinacion: Future[Option[Int]] = Functor[Future].compose[Option].map(dato)(doblarNumero)
+    val futuroCombinacion: Future[Option[Int]] = Functor[Future].compose[Option].map(dato)(doblarNumero)
 
     /*
     Sin hacer composición la manera para aplicar la función al tipo de dato Int sería
@@ -80,7 +79,7 @@ class FunctorTest extends AsyncFunSuite{
       dato.map(_.map(doblarNumero))
 
      */
-    resultadoCombinacion map { valor => assert(valor == Some(10)) }
+    futuroCombinacion.map( valor => assert( Some(10) == valor))
   }
 
   test("Componiendo diferentes Functores. " +
@@ -124,30 +123,6 @@ class FunctorTest extends AsyncFunSuite{
     }
   }
 
-  test("otra composición") {
-
-//    val listOption: List[Option[Int]] = List(Some(1), None, Some(2))
-//    val r: List[Option[Int]] = Functor[List].compose[Option].map(listOption)(_ + 1)
-//
-//    def anidado[F[_]: Functor, A](elemento: F[A]): F[A] = {
-//      Functor[F].map(elemento)( e => {
-//        //println(e)
-//        e
-//      })
-//    }
-
-
-//    val composicion = Functor[List].compose[Option]
-//    type tipoListaOpcional[A] = List[Option[A]]
-//    val listOptionFuture: List[Option[Future[Int]]] = List(Some(Future(1)), None, Some(Future(2)))
-//    val x: tipoListaOpcional[Int] = anidado[tipoListaOpcional, Int](listOption)(composicion)
-//
-//    println(s"si: ${x}")
-
-
-    ???
-
-  }
 
   /*
     Type constructor:
