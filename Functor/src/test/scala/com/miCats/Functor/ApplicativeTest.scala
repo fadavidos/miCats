@@ -28,10 +28,6 @@ class ApplicativeTest extends AsyncFunSuite {
   }
 
   test("Los Applicatives también se pueden componer... ") {
-
-
-    import cats.data.Validated
-    import cats.data.Nested
     import cats.Applicative
     import cats.implicits._
     import scala.concurrent.Future
@@ -42,11 +38,14 @@ class ApplicativeTest extends AsyncFunSuite {
 
     val primerValor: PosiblesValoresOpcionales[Int] = Future(List(None, Some(10)))
     val segundoValor: PosiblesValoresOpcionales[Int] = Future(List(Some(20), None))
+    val tercerValor: PosiblesValoresOpcionales[Int] = Future(List(Some(5), Some(5)))
 
-    val resultado: PosiblesValoresOpcionales[Int] = Applicative[PosiblesValoresOpcionales](composeApplicatives).map2( primerValor, segundoValor )((diez, veinte) => diez + veinte )
+    val resultado: PosiblesValoresOpcionales[Int] = Applicative[PosiblesValoresOpcionales](composeApplicatives)
+      .map3( primerValor, segundoValor, tercerValor )((diez, veinte, cinco) => diez + veinte + cinco)
 
+    // TODO: Por qué da este resutlado ???
     resultado.map( algo =>
-      assert(algo == List(None, None, Some(30), None))
+      assert(algo == List(None, None, None, None, Some(35), Some(35), None, None))
     )
   }
 
@@ -158,40 +157,9 @@ class ApplicativeTest extends AsyncFunSuite {
   }
 
 
-//
-//  test("traverse") {
-//    import cats.syntax.traverse._
-//    import cats.instances.list._
-//    import cats.instances.option._
-//
-//    val list = List(0, 1,2,3,4)
-//
-//    def table2( number: Int ): Option[Int] = {
-//      if(number == 0)
-//        None
-//      else
-//        Some(number * 2)
-//    }
-//
-//    val result: Option[List[Int]] = list.traverse[Option, Int](table2)
-//
-//    println(result)
-//  }
-//
-//
-//  test("hola") {
-//    import scala.concurrent.Future
-//    import scala.concurrent.ExecutionContext.Implicits.global
-//    import cats.Functor
-//
-//    def bar[F[_], A](x: F[A], y: F[A])= println(x)
-//
-//    val x: Option[String] = ???
-//    //x.map()
-//    bar(Future(2), Future(3))
-//  }
-
-
+test("Haciendo Traverser de un Applicaitve") {
+  assert( true )
+}
 
 
 
