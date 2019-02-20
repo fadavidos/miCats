@@ -1,8 +1,9 @@
 package com.miCats.Functor
 
-import org.scalatest.FunSuite
 
-class ApplicativeTest extends FunSuite {
+import org.scalatest.AsyncFunSuite
+
+class ApplicativeTest extends AsyncFunSuite {
 
   /*
     Applicative Functors o más fácil Applicative: Applicative[F[_]]
@@ -26,93 +27,169 @@ class ApplicativeTest extends FunSuite {
     }
   }
 
-  test("Cartesian Builder") {
+  test("Los Applicatives también se pueden componer... ") {
+
+
     import cats.data.Validated
-    import cats.data.Validated.{Valid, Invalid}
-    import cats.syntax.apply._
+    import cats.data.Nested
+    import cats.Applicative
+    import cats.implicits._
+    import scala.concurrent.Future
 
-    def validarMayoriaEdad(edad: Int): Validated[String, Int] = {
-      if ( edad >= 18 )
-        Valid(edad)
-      else
-        Invalid("Aún no es mayor de edad")
-    }
+    type PosiblesValoresOpcionales[A] = Future[List[Option[A]]]
 
-    def validarEmail(email: String): Validated[String, String] = {
-      if( email.contains("@"))
-        Valid(email)
-      else
-        Invalid("El correo no es correcto")
-    }
+    implicit val composeApplicatives = Applicative[Future] compose Applicative[List] compose Applicative[Option]
 
-    def validarGenero(char: Char): Validated[String, Char] = {
-      if(char.equals('M') || char.equals('F'))
-        Valid(char)
-      else
-        Invalid("El genero no existe")
-    }
+    val primerValor: PosiblesValoresOpcionales[Int] = Future(List(None, Some(10)))
+    val segundoValor: PosiblesValoresOpcionales[Int] = Future(List(Some(20), None))
 
-    case class Usuario(nombre: String, edad: Int, email: String, genero: Char)
+    val resultado: PosiblesValoresOpcionales[Int] = Applicative[PosiblesValoresOpcionales](composeApplicatives).map2( primerValor, segundoValor )((diez, veinte) => diez + veinte )
 
-    val miUsario =Usuario("Juan", 10, "invalido",'M')
-
-//    (
-//      validarEmail(miUsario.email),
-//      validarMayoriaEdad(miUsario.edad),
-//      validarGenero(miUsario.genero)
-//    ).mapN((mail, edad, genero) => mail )
-
-
-
-
-
-
-
+    resultado.map( algo =>
+      assert(algo == List(None, None, Some(30), None))
+    )
   }
 
-  test("por que no sirve") {
+  test("Los applicative son capaz de trabajar con multiples efectos. " +
+    "el for-comprehension es fail fast, lo que quiere decir que al 'fallar' uno de las instrucciones " +
+    "que están dentro del for, harán que las siguientes instrucciones no se ejecuten. Esto es un " +
+    "problema cuando queremos acumular todos los errores que están dentro del for." +
+    "Con los Applicatives podemos hacer acumulación de errores. ") {
+
+    import cats.data._
+    import cats.data.Validated._
+    import cats.data.Validated.{Valid, Invalid}
     import cats.implicits._
 
-    val f: (Int, Char) => Double = (i, c) => (i + c).toDouble
+    // MODELO
+    case class Usuario(nombre: String, edad: Int, email: String, genero: Char)
 
-    val int: Option[Int] = Some(5)
-    val char: Option[Char] = Some('a')
-    val x: Option[Char => Double] = int.map(i => (c: Char) => f(i, c)) // what now?
+    type DatoValidado[A] = ValidatedNec[ErrorNegocio, A]
 
-
-  }
-
-  test("traverse") {
-    import cats.syntax.traverse._
-    import cats.instances.list._
-    import cats.instances.option._
-
-    val list = List(0, 1,2,3,4)
-
-    def table2( number: Int ): Option[Int] = {
-      if(number == 0)
-        None
-      else
-        Some(number * 2)
+    sealed trait ErrorNegocio {
+      def mensajeDeError: String
     }
 
-    val result: Option[List[Int]] = list.traverse[Option, Int](table2)
+    case object MenorEdad extends ErrorNegocio {
+      override def mensajeDeError: String = "Es menor de edad"
+    }
 
-    println(result)
+    case object EmailInvalido extends ErrorNegocio {
+      override def mensajeDeError: String = "El correo no es correcto"
+    }
+
+    case object GeneroInexistente extends ErrorNegocio {
+      override def mensajeDeError: String = "El negero no existe"
+    }
+
+    // VALIDACIONES DE NEGOCIO.
+    def validarMayoriaEdad(edad: Int): DatoValidado[Int] = {
+      if ( edad >= 18 )
+      edad.validNec
+      else
+      MenorEdad.invalidNec
+    }
+
+    def validarEmail(email: String): DatoValidado[String] = {
+      if( email.contains("@"))
+      email.validNec
+      else
+      EmailInvalido.invalidNec
+    }
+
+    def validarGenero(char: Char): DatoValidado[Char] = {
+      if(char.equals('M') || char.equals('F'))
+      char.validNec
+      else
+      GeneroInexistente.invalidNec
+    }
+
+    // OBJETO A VALIDAR.
+    val miUsarioConErrores = Usuario("Juan", 10, "invalido",'M')
+
+    /*
+    Con ayuda del `mapN` podemos hacer multiples validaciones y
+    acumular los errores.
+     */
+    val validacionFallida = (
+      validarEmail(miUsarioConErrores.email),
+      validarMayoriaEdad(miUsarioConErrores.edad),
+      validarGenero(miUsarioConErrores.genero)
+    ).mapN((mail, edad, genero) => {
+      Usuario(miUsarioConErrores.nombre, edad, mail, genero)
+    } )
+
+    /*
+    Las validaciones de Mayoría de edad y Email valido fallaron,
+    ya que no cumplía con las condiciones, pero se logran obtener
+    todos los errores en una sola validación.
+     */
+    validacionFallida match {
+      case Valid( _ ) => assert(false)
+      case Invalid( errores ) => {
+        assert( errores.toList.contains(MenorEdad) )
+        assert( errores.toList.contains(EmailInvalido))
+      }
+    }
+
+    // OBJETO A VALIDAR.
+    val miUsarioCorrecto = Usuario("Juan", 19, "correo@gmail.com",'M')
+
+    /*
+    Con ayuda del `mapN` podemos hacer multiples validaciones y
+    acumular los errores.
+     */
+    val validacionExitosa = (
+      validarEmail(miUsarioCorrecto.email),
+      validarMayoriaEdad(miUsarioCorrecto.edad),
+      validarGenero(miUsarioCorrecto.genero)
+    ).mapN((mail, edad, genero) => {
+      Usuario(miUsarioCorrecto.nombre, edad, mail, genero)
+    } )
+
+    /*
+    Todas las validaciones son exitosas, así que podemos obtener
+    una respuesta positiva.
+     */
+    validacionExitosa match {
+      case Valid( usuarioValidado ) => assert(usuarioValidado.edad == 19 )
+      case Invalid( _ ) => assert( false )
+    }
   }
 
 
-  test("hola") {
-    import scala.concurrent.Future
-    import scala.concurrent.ExecutionContext.Implicits.global
-    import cats.Functor
-
-    def bar[F[_], A](x: F[A], y: F[A])= println(x)
-
-    val x: Option[String] = ???
-    //x.map()
-    bar(Future(2), Future(3))
-  }
+//
+//  test("traverse") {
+//    import cats.syntax.traverse._
+//    import cats.instances.list._
+//    import cats.instances.option._
+//
+//    val list = List(0, 1,2,3,4)
+//
+//    def table2( number: Int ): Option[Int] = {
+//      if(number == 0)
+//        None
+//      else
+//        Some(number * 2)
+//    }
+//
+//    val result: Option[List[Int]] = list.traverse[Option, Int](table2)
+//
+//    println(result)
+//  }
+//
+//
+//  test("hola") {
+//    import scala.concurrent.Future
+//    import scala.concurrent.ExecutionContext.Implicits.global
+//    import cats.Functor
+//
+//    def bar[F[_], A](x: F[A], y: F[A])= println(x)
+//
+//    val x: Option[String] = ???
+//    //x.map()
+//    bar(Future(2), Future(3))
+//  }
 
 
 
