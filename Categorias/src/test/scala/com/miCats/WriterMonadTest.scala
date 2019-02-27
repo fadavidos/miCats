@@ -1,7 +1,5 @@
-package com.miCats.Functor
+package com.miCats
 
-import cats.{Id, data}
-import cats.data.WriterT
 import org.scalatest.FunSuite
 
 class WriterMonadTest extends FunSuite {
@@ -16,8 +14,7 @@ class WriterMonadTest extends FunSuite {
   test("Se crea nuestro primer Writer y usamos la función `writter` para obtener " +
     "los logs y la función `value` para obtener el resultado") {
     import cats.Id
-    import cats.data.Writer
-    import cats.data.WriterT
+    import cats.data.{Writer, WriterT}
 
     /*
     Al crear el Writer nosotros esperamos un [List[String],Int], pero realmente obtenemos un
@@ -45,11 +42,10 @@ class WriterMonadTest extends FunSuite {
 
   test("Concatenando Writer con `flatmap`") {
 
-    import cats.data.Writer
+    import cats.Id
+    import cats.data.{Writer, WriterT}
     import cats.instances.vector._
     import cats.syntax.writer._
-    import cats.Id
-    import cats.data.WriterT
 
     def contadorPeticiones(ip: String ): Writer[Vector[String], Int] =
       Writer(Vector(s"Petición de la ip: ${ip}"), 1)
@@ -78,11 +74,10 @@ class WriterMonadTest extends FunSuite {
   }
 
   test("Los logs se pueden transformar con `mapWritten`, aplicándoles alguna función. ") {
-    import cats.syntax.writer._
-    import cats.data.Writer
-    import cats.instances.vector._
     import cats.Id
-    import cats.data.WriterT
+    import cats.data.{Writer, WriterT}
+    import cats.instances.vector._
+    import cats.syntax.writer._
 
     val resultado: WriterT[Id, Vector[String], Int] = for {
       _ <- Vector("hola").tell
@@ -102,11 +97,10 @@ class WriterMonadTest extends FunSuite {
   }
 
   test("Transformando ambos lados del Writer con `bimap` y `mapBoth`") {
-    import cats.data.WriterT
     import cats.Id
-    import cats.syntax.writer._
-    import cats.data.Writer
+    import cats.data.{Writer, WriterT}
     import cats.instances.vector._
+    import cats.syntax.writer._
 
     val resultado: WriterT[Id, Vector[String], Int] = for {
       _ <- Vector("hola").tell
@@ -140,6 +134,7 @@ class WriterMonadTest extends FunSuite {
     "resultado y en los logs se ve cuáles números intervinieron para llegar al resultado. ") {
     import cats.data.Writer
     import cats.instances.vector._
+
     import scala.util.Random
 
     type Aleatorio[A] = Writer[Vector[String], Int]

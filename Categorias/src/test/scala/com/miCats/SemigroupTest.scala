@@ -1,4 +1,4 @@
-package com.miCats.Functor
+package com.miCats
 
 import org.scalatest.FunSuite
 

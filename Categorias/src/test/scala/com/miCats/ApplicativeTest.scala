@@ -1,5 +1,4 @@
-package com.miCats.Functor
-
+package com.miCats
 
 import org.scalatest.AsyncFunSuite
 
@@ -30,6 +29,7 @@ class ApplicativeTest extends AsyncFunSuite {
   test("Los Applicatives también se pueden componer... ") {
     import cats.Applicative
     import cats.implicits._
+
     import scala.concurrent.Future
 
     type PosiblesValoresOpcionales[A] = Future[List[Option[A]]]
@@ -55,9 +55,8 @@ class ApplicativeTest extends AsyncFunSuite {
     "problema cuando queremos acumular todos los errores que están dentro del for." +
     "Con los Applicatives podemos hacer acumulación de errores. ") {
 
+    import cats.data.Validated.{Invalid, Valid, _}
     import cats.data._
-    import cats.data.Validated._
-    import cats.data.Validated.{Valid, Invalid}
     import cats.implicits._
 
     // MODELO

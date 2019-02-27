@@ -1,4 +1,4 @@
-package com.miCats.Functor
+package com.miCats
 
 import org.scalatest.FunSuite
 
@@ -94,8 +94,8 @@ class TypeClassTest extends FunSuite{
     val persona: Persona = Persona("Juan", "Pérez")
 
 
-    import ImprimirCosas._
     import ImpresoraInstancias._
+    import ImprimirCosas._
     /*
      Se llama la función imprimir de Int y Persona, e importando los implicitos. Es más natural llamar la función imprimir
      del objeto `numero` y `persona`

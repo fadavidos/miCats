@@ -1,5 +1,4 @@
-package com.miCats.Functor
-
+package com.miCats
 
 import cats.Id
 import org.scalatest.FunSuite
@@ -72,9 +71,8 @@ class ReaderMonadTest extends FunSuite {
     " - Se hace validación de la respuesta del calculo del iva + valor del producto. " +
     "Entonces: " +
     " - Al valor del producto se le añade el iva obtenido de la configuración. ") {
-    import com.typesafe.config.ConfigFactory
-    import com.typesafe.config.Config
     import cats.data.Reader
+    import com.typesafe.config.{Config, ConfigFactory}
 
     val config = ConfigFactory.load()
 

@@ -1,4 +1,4 @@
-package com.miCats.Functor
+package com.miCats
 
 import org.scalatest.AsyncFunSuite
 
@@ -58,6 +58,7 @@ class FunctorTest extends AsyncFunSuite {
 
     import cats.Functor
     import cats.implicits._
+
     import scala.concurrent.Future
 
     val dato: Future[Option[Int]] = Future(Some(5))
@@ -88,6 +89,7 @@ class FunctorTest extends AsyncFunSuite {
 
     import cats.Functor
     import cats.implicits._
+
     import scala.concurrent.Future
 
     // Se crea un tipo propio de dato, que represente algo para nosotros.
