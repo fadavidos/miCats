@@ -12,7 +12,7 @@ lazy val commonSettings = Seq(
   )
 )
 
-lazy val Categorias = (project in file("Functor"))
+lazy val Categorias = (project in file("Categorias"))
   .settings(
     commonSettings
   )
