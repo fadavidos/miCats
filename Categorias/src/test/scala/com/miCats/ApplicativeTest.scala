@@ -15,7 +15,7 @@ class ApplicativeTest extends AsyncFunSuite {
    */
 
   test("Podemos crear un Applicative de Option dando simplemente " +
-    "el valor interno que tendrá el Option") {
+    "el valor interno que tendrá el Option. En otras palabas aplicar un valor a un efecto.") {
     import cats.Applicative
     import cats.implicits._
 
@@ -25,6 +25,34 @@ class ApplicativeTest extends AsyncFunSuite {
       valorOpcional
     }
   }
+
+  test("Los applicatives nos permiten aplicar una valor a un efecto, y a su vez poder aplicarlo " +
+    "a una función también en un efecto."){
+    import cats.Applicative
+    import cats.implicits._
+
+    def multiplicarEnTexto(numero1: Int)(numero2: Long): String = s"${(numero1 * numero2.toInt)}"
+
+    val posibleNumero: Option[Int] = Some(3)
+
+    /*
+    Al llamar la función de `multiplicarEnTexto` en el map, automáticamente se pasa como primer parámetro
+    el Int que esta dentro del Option. Quedando la función parcialmente aplicada, necesitando un Long
+    para poder entregar el String resultante. Lo anterior envuelto en un Option.
+     */
+    val funcionDentroEfecto: Option[Long => String] = posibleNumero.map(multiplicarEnTexto)
+
+    val miAplicative = Applicative[Option]
+
+    assertResult(Some("15")) {
+      /*
+      Con ap podemos aplicar a una función un valor, ambos dentro de un contexto
+      (para el caso un Option)
+       */
+      miAplicative.ap(funcionDentroEfecto)(miAplicative.pure(5L))
+    }
+  }
+
 
   test("Los Applicatives también se pueden componer... ") {
     import cats.Applicative
