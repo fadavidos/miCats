@@ -53,6 +53,27 @@ class ApplicativeTest extends AsyncFunSuite {
     }
   }
 
+  test("No solo podemos aplicar un valor a una función, sino también aplicar multiples valores " +
+    "a una función. Acá aplicaremos 5 valores a una misma función") {
+
+    import cats.Applicative
+    import cats.implicits._
+    import scala.concurrent.Future
+
+    def obtenerUsuario(): Future[String] = Future("Pedro")
+    def obtenerDatos(): Future[String] = Future("Programador")
+    def obtenerEdad(): Future[Int] = Future(29)
+
+    case class Persona(usuario: String, datos: String, edad: Int)
+
+    val miApplicativeFuture = Applicative[Future]
+
+    val funcionConEfecto = miApplicativeFuture.pure(Persona(_,_,_))
+
+    miApplicativeFuture.ap3(funcionConEfecto)(obtenerUsuario(), obtenerDatos(), obtenerEdad())
+      .map( per => assert( per.edad == 29 ) )
+  }
+
 
   test("Los Applicatives también se pueden componer... ") {
     import cats.Applicative
