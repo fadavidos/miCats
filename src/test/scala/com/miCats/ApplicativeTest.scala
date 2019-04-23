@@ -9,6 +9,8 @@ class ApplicativeTest extends AsyncFunSuite {
 
     * Extiende de Functor, pero a diferencia de éste, es capaz de trabajar con multiples
        efectos independientes y posteriormente componerlos.
+    * La idea es que todos los efectos sean evaluados independientemente del resultado del cada uno.
+    *   Si la evaluación de un efecto falla, no afectará la evaluación de los demás.
 
     * Tiene una función `pure`, que permite embolver un dato dentro de un type constructor =>  def pure[A](x: A): F[A]
 
