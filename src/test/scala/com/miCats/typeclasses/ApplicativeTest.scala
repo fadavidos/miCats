@@ -1,4 +1,4 @@
-package com.miCats
+package com.miCats.typeclasses
 
 import org.scalatest.AsyncFunSuite
 
@@ -60,6 +60,7 @@ class ApplicativeTest extends AsyncFunSuite {
 
     import cats.Applicative
     import cats.implicits._
+
     import scala.concurrent.Future
 
     def obtenerUsuario(): Future[String] = Future("Pedro")

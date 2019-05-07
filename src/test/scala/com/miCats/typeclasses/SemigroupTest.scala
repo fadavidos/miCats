@@ -1,4 +1,4 @@
-package com.miCats
+package com.miCats.typeclasses
 
 import org.scalatest.FunSuite
 
