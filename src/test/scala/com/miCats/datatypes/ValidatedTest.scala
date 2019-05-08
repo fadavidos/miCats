@@ -2,7 +2,7 @@ package com.miCats.datatypes
 
 import org.scalatest.FunSuite
 
-class Validated extends FunSuite {
+class ValidatedTest extends FunSuite {
 
   test("I can transform from EitherT to ValidatedNel") {
     import cats.data.Validated.Valid
