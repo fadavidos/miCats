@@ -9,7 +9,7 @@ class NestedTest extends AsyncFunSuite {
     import cats.data._
     import cats.implicits._
 
-    val listOptional = List(Some(1), Some(2), None, Some(4))
+    val listOptional: List[Option[Int]] = List(Some(1), Some(2), None, Some(4))
 
     val nested: Nested[List, Option, Int] = Nested(listOptional)
 

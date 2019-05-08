@@ -66,4 +66,18 @@ class EitherTest extends AsyncFunSuite {
     }
   }
 
+  def combine2[L, R, B](v1: Future[Either[L, R]], v2: Future[Either[L, R]])(fr: (R, R) => B): Future[Either[L, B]] = {
+    for {
+      one <- v1
+      two <- v2
+    } yield {
+      for {
+        o <- one
+        t <- two
+      } yield {
+        fr(o, t)
+      }
+    }
+  }
+
 }
