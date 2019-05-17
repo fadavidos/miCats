@@ -1,5 +1,6 @@
 package com.miCats.datatypes
 
+import cats.data.ValidatedNel
 import org.scalatest.AsyncFunSuite
 
 class NestedTest extends AsyncFunSuite {
@@ -48,6 +49,23 @@ class NestedTest extends AsyncFunSuite {
         case Right(_) => assert(false)
         case Left(msj) => assert(msj == "fail")
       }
+    })
+  }
+
+  test("Nested allows us to compose two map operations into one. " +
+    "Future and ValidatedNel's Valid") {
+    import cats.data.Nested
+    import cats.implicits._
+    import scala.concurrent.Future
+    import cats.data.Validated.{Valid, Invalid}
+
+    val success: Future[ValidatedNel[String, Int]] = Future.successful(2.validNel)
+    val nestedSuccess = Nested(success)
+    val operationOverNested = nestedSuccess.map(_ * 3)
+
+    operationOverNested.value.map(_ match {
+      case Valid(6) => assert(true)
+      case Invalid(_) => assert(false)
     })
   }
 

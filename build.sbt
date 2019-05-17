@@ -10,5 +10,6 @@ libraryDependencies ++= Seq(
   "org.scalatest"     %%  "scalatest"     % "3.0.5"       %   "test",
   "com.typesafe"      %   "config"        % "1.3.2",
   "org.typelevel"     %%  "cats-core"     % versionCats,
+  "org.typelevel"     %%  "cats-free"     % versionCats,
   "org.typelevel"     %%  "cats-testkit"  % versionCats
 )
